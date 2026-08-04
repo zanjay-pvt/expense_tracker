@@ -13,24 +13,32 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  //controller
+  // controllers
   final newExpenseNameController = TextEditingController();
   final newExpenseAmountController = TextEditingController();
-  //AddnewExpenses
+
+  @override
+  void initState() {
+    super.initState();
+    // Load existing data from Hive when the app starts
+    Provider.of<ExpenseData>(context, listen: false).prepareData();
+  }
+
+  // Add new expenses dialog
   void AddNewExpenses() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text("Add New Expense"),
+        title: const Text("Add New Expense"),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            //Expense name
+            // Expense name
             TextField(
               controller: newExpenseNameController,
               decoration: const InputDecoration(hintText: "Expense Name"),
             ),
-            //expense amount
+            // Expense amount
             TextField(
               controller: newExpenseAmountController,
               decoration: const InputDecoration(hintText: "Amount"),
@@ -39,34 +47,92 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
         actions: [
-          MaterialButton(onPressed: Save, child: Text("Save")),
-
-          MaterialButton(onPressed: Cancel, child: Text("Cancel")),
+          MaterialButton(onPressed: Save, child: const Text("Save")),
+          MaterialButton(onPressed: Cancel, child: const Text("Cancel")),
         ],
       ),
     );
   }
 
-  //Save
-  void Save() {
-    ExpenseItems newExpense = ExpenseItems(
-      name: newExpenseNameController.text,
-      amount: newExpenseAmountController.text,
-      time: DateTime.now(),
+  // delete
+  void deleteExpense(ExpenseItems expense) {
+    Provider.of<ExpenseData>(context, listen: false).DeleteExpenses(expense);
+  }
+
+  // update
+  void editExpense(ExpenseItems expenseToEdit) {
+    final editNameController = TextEditingController(text: expenseToEdit.name);
+    final editAmountController = TextEditingController(text: expenseToEdit.amount);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Edit Expense"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: editNameController,
+              decoration: const InputDecoration(hintText: "Expense Name"),
+            ),
+            TextField(
+              controller: editAmountController,
+              decoration: const InputDecoration(hintText: "Amount"),
+              keyboardType: TextInputType.number,
+            ),
+          ],
+        ),
+        actions: [
+          MaterialButton(
+            onPressed: () {
+              if (editNameController.text.isNotEmpty &&
+                  editAmountController.text.isNotEmpty) {
+                ExpenseItems updatedExpense = ExpenseItems(
+                  name: editNameController.text,
+                  amount: editAmountController.text,
+                  time: expenseToEdit.time, // Retains original time/date
+                );
+
+                Provider.of<ExpenseData>(context, listen: false)
+                    .UpdateExpense(expenseToEdit, updatedExpense);
+              }
+              Navigator.pop(context);
+            },
+            child: const Text("Save"),
+          ),
+          MaterialButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+        ],
+      ),
     );
-    Provider.of<ExpenseData>(context, listen: false).AddExpenses(newExpense);
+  }
+
+  // Save
+  void Save() {
+    // Only save if text fields are not empty
+    if (newExpenseNameController.text.isNotEmpty &&
+        newExpenseAmountController.text.isNotEmpty) {
+      ExpenseItems newExpense = ExpenseItems(
+        name: newExpenseNameController.text,
+        amount: newExpenseAmountController.text,
+        time: DateTime.now(),
+      );
+      Provider.of<ExpenseData>(context, listen: false).AddExpenses(newExpense);
+    }
 
     Navigator.pop(context);
     clear();
   }
 
-  //cancel
+  // Cancel
   void Cancel() {
     Navigator.pop(context);
     clear();
   }
 
-  //clear text controller
+  // Clear text controller
   void clear() {
     newExpenseNameController.clear();
     newExpenseAmountController.clear();
@@ -77,27 +143,38 @@ class _HomePageState extends State<HomePage> {
     return Consumer<ExpenseData>(
       builder: (context, value, child) => Scaffold(
         backgroundColor: Colors.grey[300],
+        appBar: AppBar(
+          title: const Text('Expense Tracker'),
+          backgroundColor: Colors.grey[900],
+          foregroundColor: Colors.white,
+          elevation: 0,
+        ),
         floatingActionButton: FloatingActionButton(
           onPressed: AddNewExpenses,
-          child: Icon(Icons.add, color: Colors.white),
           backgroundColor: Colors.black,
+          child: const Icon(Icons.add, color: Colors.white),
         ),
         body: ListView(
           children: [
-            //weekly summary
+            // Weekly summary graph
             ExpenseSummary(startOfWeek: value.StartOfWeekDate()),
             const SizedBox(height: 20),
 
-            //expence summary
+            // Expense list view
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: value.getAllExpenseList().length,
-              itemBuilder: (context, index) => ExpenseTile(
-                name: value.getAllExpenseList()[index].name.toString(),
-                amount: value.getAllExpenseList()[index].amount,
-                date: value.getAllExpenseList()[index].time,
-              ),
+              itemBuilder: (context, index) {
+                ExpenseItems currentExpense = value.getAllExpenseList()[index];
+                return ExpenseTile(
+                  name: currentExpense.name.toString(),
+                  amount: currentExpense.amount,
+                  date: currentExpense.time,
+                  deleteTapped: (p0) => deleteExpense(currentExpense),
+                  updateTapped: (p0) => editExpense(currentExpense),
+                );
+              },
             ),
           ],
         ),

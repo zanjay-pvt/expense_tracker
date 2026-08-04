@@ -42,7 +42,7 @@ class MyBarGraph extends StatelessWidget {
         gridData: FlGridData(show: false),
         borderData: FlBorderData(show: false),
 
-        maxY: 100,
+        maxY: maxY ?? 0,
         minY: 0,
         titlesData: FlTitlesData(
           show: true,
