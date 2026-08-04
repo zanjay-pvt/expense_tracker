@@ -26,9 +26,16 @@ class _HomePageState extends State<HomePage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             //Expense name
-            TextField(controller: newExpenseNameController),
+            TextField(
+              controller: newExpenseNameController,
+              decoration: const InputDecoration(hintText: "Expense Name"),
+            ),
             //expense amount
-            TextField(controller: newExpenseAmountController),
+            TextField(
+              controller: newExpenseAmountController,
+              decoration: const InputDecoration(hintText: "Amount"),
+              keyboardType: TextInputType.number,
+            ),
           ],
         ),
         actions: [
@@ -54,7 +61,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   //cancel
-  void Cancel() {}
+  void Cancel() {
+    Navigator.pop(context);
+    clear();
+  }
 
   //clear text controller
   void clear() {
@@ -69,15 +79,16 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.grey[300],
         floatingActionButton: FloatingActionButton(
           onPressed: AddNewExpenses,
-          child: Icon(Icons.add),
+          child: Icon(Icons.add, color: Colors.white),
+          backgroundColor: Colors.black,
         ),
         body: ListView(
           children: [
-
             //weekly summary
             ExpenseSummary(startOfWeek: value.StartOfWeekDate()),
+            const SizedBox(height: 20),
+
             //expence summary
-            
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),

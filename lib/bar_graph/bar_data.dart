@@ -22,15 +22,14 @@ class BarData {
   List<Bargraph> barDatas = [];
 
   void initializeBarData() {
-    barDatas = [Bargraph(x: 1, y: sunAmount),
-    Bargraph(x: 1, y: sunAmount),
-    Bargraph(x: 2, y: monAmount),
-    Bargraph(x: 3, y: tueAmount),
-    Bargraph(x: 4, y: wedAmount),
-    Bargraph(x: 5, y: thurAmount),
-    Bargraph(x: 6, y: friAmount),
-    Bargraph(x: 7, y: satAmount),
+    barDatas = [
+      Bargraph(x: 0, y: sunAmount),
+      Bargraph(x: 1, y: monAmount),
+      Bargraph(x: 2, y: tueAmount),
+      Bargraph(x: 3, y: wedAmount),
+      Bargraph(x: 4, y: thurAmount),
+      Bargraph(x: 5, y: friAmount),
+      Bargraph(x: 6, y: satAmount),
     ];
-    
   }
 }
