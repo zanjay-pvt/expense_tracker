@@ -1,5 +1,5 @@
 import 'package:expense_tracker/data/expense_data.dart';
-import 'package:expense_tracker/pages/home_page.dart';
+import 'package:expense_tracker/pages/splashscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
       create: (context) => ExpenseData(),
       builder: (context, child) => const MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: HomePage(),
+        home: const Splashscreen(),
       ),
     );
   }
