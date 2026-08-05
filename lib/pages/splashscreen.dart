@@ -35,9 +35,9 @@ class _SplashscreenState extends State<Splashscreen> {
           Colors.black, // Change to match your GIF's background color
       body: SizedBox.expand(
         child: Image.asset(
-          'lib/asset/animation/fintech_intro_4k.gif',
+          'lib/asset/animation/splash_screen.gif',
           fit: BoxFit
-              .fitWidth, // Keeps your landscape ratio filling the screen nicely
+              .cover, // Keeps your landscape ratio filling the screen nicely
         ),
       ),
     );
